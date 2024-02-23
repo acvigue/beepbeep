@@ -24,10 +24,7 @@ const refreshOrCreate = async (tuner_id: number) => {
     }
   }
 
-  const browser = await webkit.launch({
-    headless: false,
-    args: ["--no-sandbox"],
-  });
+  const browser = await webkit.launch();
   try {
     const page = await browser.newPage();
 

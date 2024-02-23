@@ -1,8 +1,4 @@
-import { AsyncTask, SimpleIntervalJob } from "toad-scheduler";
-import { config } from "dotenv";
 import { webkit } from "playwright";
-import { fa, faker } from "@faker-js/faker";
-import { TVBestLogin } from "./entity/TVBestLogin";
 import { AppDataSource } from "./datasource";
 import { PooledPhone } from "./entity/PooledPhone";
 
@@ -73,6 +69,7 @@ export const getPhoneNumber = async () => {
 
 export const getVerificationCodeLoop = (internal_id: number) => {
   return new Promise<string>((resolve, reject) => {
+    let i = 0;
     const interval = setInterval(async () => {
       try {
         console.log(`Checking for code on ${internal_id}");`);
@@ -90,6 +87,12 @@ export const getVerificationCodeLoop = (internal_id: number) => {
           resolve(code);
         } else {
           console.log("No code found");
+          i++;
+
+          if (i > 10) {
+            clearInterval(interval);
+            reject("No code found after 10 attempts");
+          }
         }
       } catch (e) {
         console.error(e);
@@ -99,10 +102,7 @@ export const getVerificationCodeLoop = (internal_id: number) => {
 };
 
 const getVerificationCode = async (internal_id: number) => {
-  const browser = await webkit.launch({
-    headless: false,
-    args: ["--no-sandbox"],
-  });
+  const browser = await webkit.launch();
   try {
     const page = await browser.newPage();
 

@@ -12,5 +12,4 @@ export const AppDataSource = new DataSource({
   database: resolve(process.env.CONFIG_PATH ?? "", "database.db"),
   entities: [PooledPhone, TVBestLogin],
   synchronize: true,
-  logging: true,
 });

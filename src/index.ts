@@ -1,16 +1,36 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { webkit } from "playwright";
 import { AppDataSource } from "./datasource";
 import { ToadScheduler } from "toad-scheduler";
 import { refreshJob } from "./apollogroup-tv";
 import { TVBestLogin } from "./entity/TVBestLogin";
 import { config } from "dotenv";
-import { parse } from "iptv-playlist-parser";
+import { LessThan, MoreThan, MoreThanOrEqual } from "typeorm";
 
 config();
 const app = new Hono();
 const scheduler = new ToadScheduler();
+let concurrentStream = 0;
+
+app.post("/webhook", async (c) => {
+  const body = await c.req.parseBody();
+  const payload = JSON.parse(body.payload as string);
+  console.log(payload);
+
+  const event = payload.event;
+
+  if (event === "media.play" && payload.Metadata.live === 1) {
+    console.log("Live TV playing, increasing concurrent stream...");
+    concurrentStream++;
+  } else if (event === "media.stop" && payload.Metadata.live === 1) {
+    console.log("Live TV stopped, decreasing concurrent stream...");
+    concurrentStream--;
+    if (concurrentStream < 0) {
+      concurrentStream = 0;
+    }
+  }
+  return c.json({ success: true });
+});
 
 app.get("/channels", async (c) => {
   const repo = AppDataSource.getRepository(TVBestLogin);
@@ -30,11 +50,17 @@ app.get("/channels", async (c) => {
 
 app.get("/stream/:id", async (c) => {
   const channel_id = c.req.param("id");
-  const currentStreams = 0;
   const repo = AppDataSource.getRepository(TVBestLogin);
   const logins = await repo.findOneOrFail({
-    where: { tuner_id: currentStreams },
+    where: {
+      tuner_id: MoreThanOrEqual(concurrentStream),
+      expires_at: MoreThan(new Date()),
+    },
   });
+  if (!logins) {
+    return c.text("No logins found", 500);
+  }
+
   const url = `https://tvnow.best/api/stream/${logins.username}/${logins.password}/livetv.epg/${channel_id}`;
   return c.redirect(url);
 });
