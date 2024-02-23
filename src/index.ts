@@ -2,22 +2,41 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { webkit } from "playwright";
 import { AppDataSource } from "./datasource";
+import { ToadScheduler } from "toad-scheduler";
+import { refreshJob } from "./apollogroup-tv";
+import { TVBestLogin } from "./entity/TVBestLogin";
+import { config } from "dotenv";
+import { parse } from "iptv-playlist-parser";
 
+config();
 const app = new Hono();
+const scheduler = new ToadScheduler();
 
-app.get("/live", async (c) => {
-  const browser = await webkit.launch();
-  const page = await browser.newPage();
+app.get("/channels", async (c) => {
+  const repo = AppDataSource.getRepository(TVBestLogin);
+  const logins = await repo.findOneOrFail({ where: { tuner_id: 0 } });
+  const url = `https://tvnow.best/api/list/${logins.username}/${logins.password}`;
+  const resp = await fetch(url);
+  const respText = await resp.text();
 
-  // The actual interesting bit
-  await page.route("**.jpg", (route) => route.abort());
-  await page.goto("https://google.com/");
+  const internalURL = process.env.EXTERNAL_STREAM_ACCESS ?? "";
 
-  const pageTitle = await page.title();
+  const filteredRespText = respText.replaceAll(
+    `https://tvnow.best/api/stream/${logins.username}/${logins.password}/livetv.epg/`,
+    `${internalURL}/stream/`
+  );
+  return c.text(filteredRespText);
+});
 
-  // Teardown
-  await browser.close();
-  return c.text(pageTitle);
+app.get("/stream/:id", async (c) => {
+  const channel_id = c.req.param("id");
+  const currentStreams = 0;
+  const repo = AppDataSource.getRepository(TVBestLogin);
+  const logins = await repo.findOneOrFail({
+    where: { tuner_id: currentStreams },
+  });
+  const url = `https://tvnow.best/api/stream/${logins.username}/${logins.password}/livetv.epg/${channel_id}`;
+  return c.redirect(url);
 });
 
 AppDataSource.initialize().then(() => {
@@ -29,4 +48,6 @@ AppDataSource.initialize().then(() => {
     fetch: app.fetch,
     port,
   });
+
+  scheduler.addSimpleIntervalJob(refreshJob());
 });

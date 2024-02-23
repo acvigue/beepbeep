@@ -3,16 +3,21 @@
     "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@hono/node-server": "^1.8.1",
     "dotenv": "^16.4.5",
     "hono": "^4.0.5",
+    "iptv-playlist-parser": "^0.13.0",
     "playwright": "^1.41.2",
     "reflect-metadata": "^0.2.1",
     "sqlite3": "^5.1.7",
-    "typeorm": "^0.3.20"
+    "toad-scheduler": "^3.0.1",
+    "typeorm": "^0.3.20",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "@types/uuid": "^9.0.8",
     "tsx": "^3.12.2"
   }
 }
