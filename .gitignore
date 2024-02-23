@@ -3,3 +3,4 @@ config
 dist
 .env
 build
+**/.DS_Store
