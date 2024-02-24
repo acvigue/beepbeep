@@ -9,28 +9,19 @@ export const getPhoneNumber = async () => {
 
     // The actual interesting bit
     await page.route("**.jpg", (route) => route.abort());
-    await page.goto("https://www.receivesms.co/us-phone-numbers/us/");
+    await page.goto("https://temp-number.com/countries/United-States");
 
-    const tableRows = await page.$$(
-      ".table > tbody:nth-child(2) > tr:not(:nth-child(1))"
-    );
+    const numbers = await page.$$("a.country-link");
 
-    for (const tableRow of tableRows) {
-      const numberBox = await tableRow.$("td:nth-child(3) > a.btn");
-
-      if (!numberBox) {
-        console.error("No number box found");
-        continue;
-      }
-
-      const number = await numberBox.innerText();
+    for (const numberLink of numbers) {
+      const number = await numberLink.innerText();
       if (number) {
-        const formattedNumber = number.replace("+1", "");
+        const formattedNumber = number.substring(1);
         const alreadyUsed = await AppDataSource.getRepository(
           PooledPhone
         ).exists({ where: { phone_number: formattedNumber, used: 1 } });
         if (!alreadyUsed) {
-          const internalIdURL = await tableRow.$("td:nth-child(5) > a");
+          const internalIdURL = await numberLink.getAttribute("href");
           const internalId = await internalIdURL?.getAttribute("href");
 
           if (internalId) {
