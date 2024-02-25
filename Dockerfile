@@ -12,14 +12,12 @@ COPY . .
 
 RUN yarn build
 
-FROM node:lts-slim as runner
+FROM mcr.microsoft.com/playwright:latest as runner
 
 ENV NODE_ENV production
 
 # Create app directory
 WORKDIR /usr/src/app
-
-RUN npx playwright install --with-deps webkit
 
 USER node
 
