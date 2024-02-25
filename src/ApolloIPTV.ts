@@ -3,9 +3,9 @@ import { config } from "dotenv";
 import { webkit } from "playwright";
 import { faker } from "@faker-js/faker";
 import { TVBestLogin } from "./entity/TVBestLogin";
-import { AppDataSource } from "./DataSource";
+import { AppDataSource } from "./datasource";
 import { getPhoneNumber, getVerificationCodeLoop } from "./apis/TempNumber";
-import { generateEmail, getLoginLinkLoop } from "./apis/TempMail";
+import { generateEmail, getLoginLinkLoop } from "./apis/tempmail";
 import { playwrightFactory } from "PlaywrightFactory";
 
 config();
