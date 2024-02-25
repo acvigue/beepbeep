@@ -19,8 +19,6 @@ ENV NODE_ENV production
 # Create app directory
 WORKDIR /usr/src/app
 
-USER node
-
 # Install app dependencies
 COPY --from=builder /usr/src/app/ ./
 
