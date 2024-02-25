@@ -5,7 +5,7 @@ import { faker } from "@faker-js/faker";
 import { TVBestLogin } from "./entity/TVBestLogin";
 import { AppDataSource } from "./datasource";
 import { getPhoneNumber, getVerificationCodeLoop } from "./apis/TempNumber";
-import { generateEmail, getLoginLinkLoop } from "./apis/tempmail";
+import { generateEmail, getLoginLinkLoop } from "./apis/TempMail";
 import { playwrightFactory } from "PlaywrightFactory";
 
 config();
