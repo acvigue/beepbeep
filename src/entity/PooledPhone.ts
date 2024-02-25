@@ -9,8 +9,5 @@ export class PooledPhone {
   phone_number!: string;
 
   @Column({ type: "int" })
-  internal_id!: number;
-
-  @Column({ type: "int" })
   used: number = 0;
 }

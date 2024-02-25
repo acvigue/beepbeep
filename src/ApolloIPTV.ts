@@ -1,11 +1,12 @@
 import { AsyncTask, SimpleIntervalJob } from "toad-scheduler";
 import { config } from "dotenv";
 import { webkit } from "playwright";
-import { fa, faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { TVBestLogin } from "./entity/TVBestLogin";
-import { AppDataSource } from "./datasource";
-import { getPhoneNumber, getVerificationCodeLoop } from "./usphonenumber";
-import { generateEmail, getLoginLinkLoop } from "./tempmail";
+import { AppDataSource } from "./DataSource";
+import { getPhoneNumber, getVerificationCodeLoop } from "./apis/TempNumber";
+import { generateEmail, getLoginLinkLoop } from "./apis/TempMail";
+import { playwrightFactory } from "PlaywrightFactory";
 
 config();
 
@@ -24,12 +25,8 @@ const refreshOrCreate = async (tuner_id: number) => {
     }
   }
 
-  const browser = await webkit.launch();
+  const { browser, page } = await playwrightFactory();
   try {
-    const page = await browser.newPage();
-
-    // The actual interesting bit
-    await page.route("**.jpg", (route) => route.abort());
     await page.goto("https://portal.apollogroup.tv/Register?trial=true");
 
     const fakeData = {
@@ -68,7 +65,7 @@ const refreshOrCreate = async (tuner_id: number) => {
       throw new Error("No phone number available");
     }
 
-    await page.fill("input.phone-validator", phoneNumber.number);
+    await page.fill("input.phone-validator", phoneNumber);
     const ip = faker.internet.ip();
     await page.route("**/sendPhoneVerificationCodeAndCreateLead", (route) => {
       if (route.request().method() !== "POST") {
@@ -98,9 +95,7 @@ const refreshOrCreate = async (tuner_id: number) => {
     await page.waitForTimeout(5000);
     await page.click(".verify-sms-btn", { timeout: 10000 });
 
-    const verificationCode = await getVerificationCodeLoop(
-      phoneNumber.internalId
-    );
+    const verificationCode = await getVerificationCodeLoop(phoneNumber);
     await page.fill(".verify-input", verificationCode, { timeout: 100000000 });
     await page.click(".verify-btn");
 
