@@ -34,7 +34,14 @@ app.post("/webhook", async (c) => {
 
 app.get("/channels", async (c) => {
   const repo = AppDataSource.getRepository(TVBestLogin);
-  const logins = await repo.findOneOrFail({ where: { tuner_id: 0 } });
+  const logins = await repo.findOneOrFail({
+    where: { expires_at: MoreThan(new Date()) },
+  });
+
+  if (!logins) {
+    return c.text("No logins found", 500);
+  }
+
   const url = `https://tvnow.best/api/list/${logins.username}/${logins.password}`;
   const resp = await fetch(url);
   const respText = await resp.text();

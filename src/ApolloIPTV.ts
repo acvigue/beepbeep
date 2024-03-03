@@ -7,22 +7,18 @@ import { AppDataSource } from "./datasource";
 import { getPhoneNumber, getVerificationCodeLoop } from "./apis/TempNumber";
 import { generateEmail, getLoginLinkLoop } from "./apis/TempMail";
 import { playwrightFactory } from "PlaywrightFactory";
+import { MoreThan } from "typeorm/find-options/operator/MoreThan";
 
 config();
 
 const refreshOrCreate = async (tuner_id: number) => {
   const existingTunerLogin = await AppDataSource.getRepository(
     TVBestLogin
-  ).findOne({ where: { tuner_id } });
+  ).findOneOrFail({ where: { tuner_id, expires_at: MoreThan(new Date()) } });
   if (!existingTunerLogin) {
     console.log(`Creating new login for tuner #${tuner_id}`);
   } else {
-    console.log(`Refreshing login for tuner #${tuner_id}`);
-
-    if (existingTunerLogin.expires_at > new Date()) {
-      console.log(`Login for tuner #${tuner_id} is still valid, skipping!`);
-      return;
-    }
+    console.log(`Login for tuner #${tuner_id} is still valid, skipping!`);
   }
 
   const { browser, page } = await playwrightFactory();
@@ -133,9 +129,5 @@ const task = new AsyncTask(
 
 export const refreshJob = () => {
   task.execute();
-  return new SimpleIntervalJob(
-    { days: parseInt(process.env.VALIDITY_PERIOD_DAYS ?? "8") },
-    task,
-    { preventOverrun: true }
-  );
+  return new SimpleIntervalJob({ days: 1 }, task, { preventOverrun: true });
 };
