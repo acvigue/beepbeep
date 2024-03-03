@@ -15,20 +15,20 @@ let concurrentStream = 0;
 app.post("/webhook", async (c) => {
   const body = await c.req.parseBody();
   const payload = JSON.parse(body.payload as string);
-  console.log(payload);
 
   const event = payload.event;
 
   if (event === "media.play" && payload.Metadata.live === 1) {
-    console.log("Live TV playing, increasing concurrent stream...");
+    console.log("Live TV playing");
     concurrentStream++;
   } else if (event === "media.stop" && payload.Metadata.live === 1) {
-    console.log("Live TV stopped, decreasing concurrent stream...");
+    console.log("Live TV stopped");
     concurrentStream--;
     if (concurrentStream < 0) {
       concurrentStream = 0;
     }
   }
+  console.log(`Concurrent streams: ${concurrentStream}`);
   return c.json({ success: true });
 });
 
