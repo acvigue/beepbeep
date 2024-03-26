@@ -109,10 +109,11 @@ const refreshOrCreate = async (tuner_id: number) => {
     newLogin.password = password;
     newLogin.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
     await AppDataSource.getRepository(TVBestLogin).save(newLogin);
+    console.log(`Signup complete for tuner #${tuner_id}`);
   } catch (e) {
+    console.log(`Error creating login for tuner #${tuner_id}`);
     console.error(e);
   } finally {
-    console.log(`Signup complete for tuner #${tuner_id}`);
     await browser.close();
   }
 };

@@ -57,7 +57,12 @@ const getLoginLink = async (email: string): Promise<string | null> => {
 
 export const getLoginLinkLoop = async (email: string): Promise<string> => {
   return new Promise<string>(async (resolve, reject) => {
+    let i = 0;
     const interval = setInterval(async () => {
+      if (i > 10) {
+        clearInterval(interval);
+        reject("No email found after 10 attempts");
+      }
       const url = await getLoginLink(email);
       if (url) {
         console.log(`Email found: ${url}`);
@@ -66,6 +71,7 @@ export const getLoginLinkLoop = async (email: string): Promise<string> => {
       } else {
         console.log("No email found");
       }
+      i++;
     }, 10000);
   });
 };
