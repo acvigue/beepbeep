@@ -124,6 +124,7 @@ const task = new AsyncTask(
   },
   (err: Error) => {
     /* handle error here */
+    console.log(err);
   }
 );
 
