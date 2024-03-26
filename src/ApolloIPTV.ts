@@ -12,13 +12,15 @@ import { MoreThan } from "typeorm/find-options/operator/MoreThan";
 config();
 
 const refreshOrCreate = async (tuner_id: number) => {
-  const existingTunerLogin = await AppDataSource.getRepository(
-    TVBestLogin
-  ).findOneOrFail({ where: { tuner_id, expires_at: MoreThan(new Date()) } });
-  if (!existingTunerLogin) {
+  const repository = await AppDataSource.getRepository(TVBestLogin);
+  try {
+    await repository.findOneOrFail({
+      where: { tuner_id, expires_at: MoreThan(new Date()) },
+    });
+    console.log(`Login for tuner #${tuner_id} still valid`);
+    return;
+  } catch (e) {
     console.log(`Creating new login for tuner #${tuner_id}`);
-  } else {
-    console.log(`Login for tuner #${tuner_id} is still valid, skipping!`);
   }
 
   const { browser, page } = await playwrightFactory();
