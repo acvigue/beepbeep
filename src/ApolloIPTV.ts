@@ -52,10 +52,10 @@ const refreshOrCreate = async (tuner_id: number) => {
     const email = await generateEmail();
 
     await page.waitForTimeout(2000);
-    await page.fill("#input-22", fakeData.name.first);
-    await page.fill("#input-27", fakeData.name.last);
-    await page.fill("#input-32", email);
-    await page.fill("#input-37", username);
+    await page.getByLabel("First Name").fill(fakeData.name.first);
+    await page.getByLabel("Last Name").fill(fakeData.name.last);
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Username").fill(username);
 
     const phoneNumber = await getPhoneNumber();
 
