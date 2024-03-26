@@ -1,7 +1,7 @@
 import { webkit } from "playwright";
 
 export const playwrightFactory = async () => {
-  const browser = await webkit.launch({ headless: false });
+  const browser = await webkit.launch();
   const page = await browser.newPage();
 
   await page.route("**.jpg", (route) => route.abort());
