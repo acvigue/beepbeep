@@ -28,7 +28,6 @@ app.post("/webhook", async (c) => {
       concurrentStream = 0;
     }
   }
-  console.log(`Concurrent streams: ${concurrentStream}`);
   return c.json({ success: true });
 });
 

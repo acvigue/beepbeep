@@ -85,10 +85,10 @@ const getVerificationCode = async (phoneNumber: string) => {
     /Your Phone verification verification code is: (?<code>[0-9]{6})/g;
   for (const message of messages) {
     const text = await $(message).text().trim();
-    console.log(text);
 
     const match = regex.test(text);
     if (match) {
+      console.log(`Message: ${text}`);
       const code = text.split("verification code is: ")[1];
       return code;
     }
