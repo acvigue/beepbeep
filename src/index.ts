@@ -41,6 +41,7 @@ app.get("/vehicle_data/:vehicle_id", async (c) => {
 
     return c.json(result, 200);
   } catch (e) {
+    console.error(e);
     return c.json({ error: "Service Unavailable" }, 500);
   }
 });
