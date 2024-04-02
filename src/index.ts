@@ -32,6 +32,7 @@ app.get("/vehicle_data/:vehicle_id", async (c) => {
         result.response.drive_state.speed,
         78
       );
+      result.response.drive_state.shift_state = "D";
 
       const { vehicle_data, ...response } = result.response;
       const newResult = { response };
@@ -46,5 +47,5 @@ app.get("/vehicle_data/:vehicle_id", async (c) => {
 
 serve({
   fetch: app.fetch,
-  port: 3001,
+  port: 3000,
 });
