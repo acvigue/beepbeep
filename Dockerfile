@@ -12,7 +12,7 @@ COPY . .
 
 RUN yarn build
 
-FROM mcr.microsoft.com/playwright:latest as runner
+FROM node:alpine as runner
 
 ENV NODE_ENV production
 
