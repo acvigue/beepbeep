@@ -35,6 +35,11 @@ app.get("/vehicle_data/:vehicle_id", async (c) => {
 
       const { vehicle_data, ...response } = result.response;
       const newResult = { response };
+
+      console.log(vehicle_data);
+
+      console.log("\n\n\n====================\n\n\n");
+
       return c.json(newResult, 200);
     }
 
