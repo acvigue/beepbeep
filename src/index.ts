@@ -30,9 +30,8 @@ app.get("/vehicle_data/:vehicle_id", async (c) => {
     ) {
       result.response.drive_state.speed = Math.min(
         result.response.drive_state.speed,
-        78
+        79
       );
-      result.response.drive_state.shift_state = "D";
 
       const { vehicle_data, ...response } = result.response;
       const newResult = { response };
